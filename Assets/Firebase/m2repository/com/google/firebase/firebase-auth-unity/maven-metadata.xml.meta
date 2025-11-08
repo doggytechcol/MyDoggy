@@ -1,11 +1,3 @@
-fileFormatVersion: 2
-guid: 397f194fd08a4159906375d8838517fc
-labels:
-- gvh
-- gvh_version-13.5.0
-- gvhp_exportpath-Firebase/m2repository/com/google/firebase/firebase-auth-unity/maven-metadata.xml
-timeCreated: 1480838400
-DefaultImporter:
-  userData:
-  assetBundleName:
-  assetBundleVariant:
+version https://git-lfs.github.com/spec/v1
+oid sha256:033a7487d08bea15da3f499da3535c492429cdbef0989fbd2500f40c36389a62
+size 288

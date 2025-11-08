@@ -1,17 +1,3 @@
-fileFormatVersion: 2
-guid: 5ed20d75f591346f486af865ed852ea6
-labels:
-- gvh
-- gvh_version-13.5.0
-- gvhp_exportpath-Firebase/FirebaseAI/ModalityTokenCount.cs
-timeCreated: 1480838400
-MonoImporter:
-  externalObjects: {}
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon:
-    instanceID: 0
-  userData:
-  assetBundleName:
-  assetBundleVariant:
+version https://git-lfs.github.com/spec/v1
+oid sha256:fa94325ec69eef30c7821dc4e8a55fac9b7f804bc0a7d1262dbf0680349a0e21
+size 361
