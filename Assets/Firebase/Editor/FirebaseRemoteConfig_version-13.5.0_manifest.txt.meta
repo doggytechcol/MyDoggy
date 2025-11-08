@@ -1,3 +1,10 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:b8ee617d82d404e530fbc08d725ce2175b40e5cd3dcd369d1b2084adf93d7191
-size 294
+fileFormatVersion: 2
+guid: 52256bed147541bcb07a7a508b71e51c
+labels:
+- gvh
+- gvh_manifest
+- gvh_version-13.5.0
+- gvhp_exportpath-Firebase/Editor/FirebaseRemoteConfig_version-13.5.0_manifest.txt
+- gvhp_manifestname-0Firebase Remote Config
+- gvhp_manifestname-1FirebaseRemoteConfig
+timeCreated: 0

@@ -1,3 +1,17 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:0e3a9c59c3b34b29468542cd022bc5591051a8c7de2413ecf543cb09ebcf58d2
-size 347
+fileFormatVersion: 2
+guid: 79ddb6505f26c4186bd80ba9962eb02a
+labels:
+- gvh
+- gvh_version-13.5.0
+- gvhp_exportpath-Firebase/FirebaseAI/Chat.cs
+timeCreated: 1480838400
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon:
+    instanceID: 0
+  userData:
+  assetBundleName:
+  assetBundleVariant:

@@ -1,3 +1,13 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:0d22dfe66f8fc1b722b5a33e6e1b2dd13127d6935d19b96296a3b0baf61d61a1
-size 310
+fileFormatVersion: 2
+guid: d13c8602d5e14e43b0e92459754c4315
+labels:
+- gvh
+- gvh_version-1.2.186
+- gvh_version-13.5.0
+- gvhp_exportpath-ExternalDependencyManager/Editor/1.2.186/Google.JarResolver.pdb
+timeCreated: 1538009133
+licenseType: Pro
+DefaultImporter:
+  userData:
+  assetBundleName:
+  assetBundleVariant:

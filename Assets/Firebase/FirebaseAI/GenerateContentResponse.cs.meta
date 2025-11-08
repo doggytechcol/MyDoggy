@@ -1,3 +1,17 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:263a60eee4eb6ae3cc6083e8d927c7c2f443d676bb92e64904f63e2a21ca8c45
-size 366
+fileFormatVersion: 2
+guid: 76e344bed23d0443ab380371627114f2
+labels:
+- gvh
+- gvh_version-13.5.0
+- gvhp_exportpath-Firebase/FirebaseAI/GenerateContentResponse.cs
+timeCreated: 1480838400
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon:
+    instanceID: 0
+  userData:
+  assetBundleName:
+  assetBundleVariant:

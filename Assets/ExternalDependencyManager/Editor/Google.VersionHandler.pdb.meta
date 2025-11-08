@@ -1,3 +1,13 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:a108e2d1a0caecd4ae9dcdfe61ab73ec400cff13d3eaf434c44a547bbaf7a58d
-size 305
+fileFormatVersion: 2
+guid: 57f5a82a79ab4b098f09326c8f3c73a6
+labels:
+- gvh
+- gvh_version-1.2.186
+- gvh_version-13.5.0
+- gvhp_exportpath-ExternalDependencyManager/Editor/Google.VersionHandler.pdb
+timeCreated: 1538009133
+licenseType: Pro
+DefaultImporter:
+  userData:
+  assetBundleName:
+  assetBundleVariant:

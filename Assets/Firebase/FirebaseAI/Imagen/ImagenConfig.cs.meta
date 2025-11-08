@@ -1,3 +1,17 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:df68f1493ba56e9514d02d4d0db0f186784b76b5ba83775d9093a54c81e1532c
-size 362
+fileFormatVersion: 2
+guid: 98ceaff0ff5394024bc30e00fb37fd0e
+labels:
+- gvh
+- gvh_version-13.5.0
+- gvhp_exportpath-Firebase/FirebaseAI/Imagen/ImagenConfig.cs
+timeCreated: 1480838400
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon:
+    instanceID: 0
+  userData:
+  assetBundleName:
+  assetBundleVariant:

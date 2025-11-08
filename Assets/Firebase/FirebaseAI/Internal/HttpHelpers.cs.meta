@@ -1,3 +1,17 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:40dc68ac12583c5721f485d080bd5a7de1f4c861561103784ccca4e9841cf5ed
-size 363
+fileFormatVersion: 2
+guid: 41bec814fadbb4099bc7489060279f26
+labels:
+- gvh
+- gvh_version-13.5.0
+- gvhp_exportpath-Firebase/FirebaseAI/Internal/HttpHelpers.cs
+timeCreated: 1480838400
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon:
+    instanceID: 0
+  userData:
+  assetBundleName:
+  assetBundleVariant:

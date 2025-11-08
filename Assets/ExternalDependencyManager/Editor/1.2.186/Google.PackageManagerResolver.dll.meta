@@ -1,3 +1,37 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:0cad8e9d2c244b84ade990c4e81302d82bb37240994144c7cd18ce772c1e99b6
-size 761
+fileFormatVersion: 2
+guid: d8bb10c56a0147bc855a6296778e025e
+labels:
+- gvh
+- gvh_version-1.2.186
+- gvh_version-13.5.0
+- gvhp_exportpath-ExternalDependencyManager/Editor/1.2.186/Google.PackageManagerResolver.dll
+- gvhp_targets-editor
+timeCreated: 1480838400
+PluginImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  iconMap: {}
+  executionOrder: {}
+  isPreloaded: 0
+  isOverridable: 0
+  platformData:
+  - first:
+      Any:
+    second:
+      enabled: 0
+      settings: {}
+  - first:
+      Editor: Editor
+    second:
+      enabled: 0
+      settings:
+        DefaultValueInitialized: true
+  - first:
+      Windows Store Apps: WindowsStoreApps
+    second:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+  userData:
+  assetBundleName:
+  assetBundleVariant:

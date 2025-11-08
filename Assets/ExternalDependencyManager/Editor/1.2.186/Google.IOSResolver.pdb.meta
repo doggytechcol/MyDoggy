@@ -1,3 +1,13 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:017963889ac84ae4c10e73430d4fc8591e686dccd3247a4aacb8fc90ab8c543a
-size 310
+fileFormatVersion: 2
+guid: baf24db2bf904e729e7796721c09e8ad
+labels:
+- gvh
+- gvh_version-1.2.186
+- gvh_version-13.5.0
+- gvhp_exportpath-ExternalDependencyManager/Editor/1.2.186/Google.IOSResolver.pdb
+timeCreated: 1538009133
+licenseType: Pro
+DefaultImporter:
+  userData:
+  assetBundleName:
+  assetBundleVariant:

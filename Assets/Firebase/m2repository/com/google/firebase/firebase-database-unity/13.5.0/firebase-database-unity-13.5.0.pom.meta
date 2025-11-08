@@ -1,3 +1,11 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:1fa65ec6e24af61f9739cf9c024734362cdad0cb1064c0e01525ae24ced79297
-size 315
+fileFormatVersion: 2
+guid: d9b52e42239843dc8440c948efd85350
+labels:
+- gvh
+- gvh_version-13.5.0
+- gvhp_exportpath-Firebase/m2repository/com/google/firebase/firebase-database-unity/13.5.0/firebase-database-unity-13.5.0.pom
+timeCreated: 1480838400
+DefaultImporter:
+  userData:
+  assetBundleName:
+  assetBundleVariant:

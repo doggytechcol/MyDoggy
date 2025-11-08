@@ -1,3 +1,11 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:e976994e6835433d5fd4ecba0d94d20e735a166cc754ef8868e4d8d2301f0671
-size 311
+fileFormatVersion: 2
+guid: ff970ee37d114dc3bb0f54f5d99325ac
+labels:
+- gvh
+- gvh_version-13.5.0
+- gvhp_exportpath-Firebase/m2repository/com/google/firebase/firebase-config-unity/13.5.0/firebase-config-unity-13.5.0.pom
+timeCreated: 1480838400
+DefaultImporter:
+  userData:
+  assetBundleName:
+  assetBundleVariant:
