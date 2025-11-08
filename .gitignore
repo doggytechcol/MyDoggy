@@ -1,0 +1,42 @@
+=============== ARCHIVOS Y CARPETAS IGNORADAS POR UNITY ===============
+
+# Carpetas generadas por Unity
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/Assets/AssetStoreTools/
+
+# Archivos de metadatos y configuración
+.DS_Store
+.unity/
+.vs/
+
+# Configuración de Visual Studio / JetBrains
+.vscode/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+
+# Archivos de macOS
+[Tt]humbs.db
+
+# Logs y Crash reports
+*.log
+*.orig
+*.stackdump
+
+# Paquetes y dependencias (depende de tu setup, pero mejor ignorar)
+/Packages/manifest.json
+/Packages/manifest.lock
+
+# IMPORTANTÍSIMO: Ignorar archivos binarios grandes y configuraciones locales
+/UserSettings/
+# Ignorar la configuración de proyectos externos si no es compartida
+/ExternalPackages/
