@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "671856043241",
+    "project_id": "mydoggy-1e14a",
+    "storage_bucket": "mydoggy-1e14a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:671856043241:android:2636cab4a9e2792673bc78",
+        "android_client_info": {
+          "package_name": "com.doggytech.mydoggy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrVlp1Sw4BsuZ8WYIj2C8UppjI93uZ5zI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
