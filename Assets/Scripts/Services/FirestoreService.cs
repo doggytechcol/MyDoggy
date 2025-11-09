@@ -102,9 +102,10 @@ public class FirestoreService : MonoBehaviour
 
     /// <summary>
     /// Carga el objeto PetModel de Firestore para el usuario actual.
+    /// NOTA: Se ha renombrado de LoadPetAsync a LoadPetDataAsync para coincidir con la llamada en AuthService.
     /// </summary>
     /// <returns>Una tupla con el PetModel, éxito y mensaje de error.</returns>
-    public async Task<(PetModel pet, bool success, string errorMessage)> LoadPetAsync()
+    public async Task<(PetModel pet, bool success, string errorMessage)> LoadPetDataAsync()
     {
         // 1. Validaciones
         if (!IsInitialized || auth?.CurrentUser == null) 
