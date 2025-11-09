@@ -59,36 +59,40 @@ public class FirestoreService : MonoBehaviour
             Debug.LogError($"[FirestoreService] ❌ Falló la inicialización de Firestore: {e.Message}");
         }
     }
-
-    // --- GUARDAR DATOS (CREATE / UPDATE) ---
+    
+    // --------------------------------------------------------------------------------
+    // --- PET PROFILE OPERATIONS (CRUD) ---
+    // --------------------------------------------------------------------------------
 
     /// <summary>
-    /// Guarda el objeto PetModel en Firestore, usando el ID del usuario como ID del documento.
+    /// Guarda el perfil inicial de la mascota en Firestore.
+    /// Utiliza el ID de usuario como ID del documento.
     /// </summary>
     /// <param name="pet">El objeto PetModel a guardar.</param>
-    /// <returns>Una tupla con éxito y mensaje de error.</returns>
+    /// <returns>Una tupla con éxito (bool) y mensaje de error (string).</returns>
     public async Task<(bool success, string errorMessage)> SavePetAsync(PetModel pet)
     {
-        // 1. Validaciones
-        if (!IsInitialized || auth?.CurrentUser == null) 
-            return (false, "Servicio no inicializado o usuario no autenticado.");
+        if (auth?.CurrentUser == null) 
+            return (false, "Usuario no autenticado para guardar.");
         
+        if (db == null) 
+            return (false, "Firestore no está inicializado para guardar.");
+
         string userId = auth.CurrentUser.UserId;
 
         try
         {
-            // 2. Serialización: Convertir PetModel (con PetStatsModel anidado) a un Dictionary
-            // CRÍTICO: Newtonsoft.Json maneja la estructura anidada automáticamente.
+            // 1. Serialización: Convertir PetModel a un formato que Firestore pueda entender (Dictionary).
+            // Convertimos a JSON y luego a Dictionary<string, object> para manejar las propiedades anidadas.
             string json = JsonConvert.SerializeObject(pet);
-            // Convertir el JSON de vuelta a un Dictionary para que Firestore lo acepte
             Dictionary<string, object> petMap = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
 
-            // 3. Escribir en Firestore
+            // 2. Guardar en Firestore con el ID de usuario como ID de documento.
             DocumentReference docRef = db.Collection(PETS_COLLECTION).Document(userId);
-            // .SetAsync() crea el documento si no existe, o lo sobrescribe si ya existe.
+            // Usamos SetAsync para crear o sobrescribir el documento completo.
             await docRef.SetAsync(petMap); 
 
-            Debug.Log($"[FirestoreService] ✅ PetModel guardado/actualizado para UserId: {userId}");
+            Debug.Log($"[FirestoreService] ✅ Mascota guardada para UserId: {userId}");
             return (true, null);
         }
         catch (Exception e)
@@ -98,19 +102,21 @@ public class FirestoreService : MonoBehaviour
         }
     }
 
-    // --- CARGAR DATOS (READ) ---
-
     /// <summary>
-    /// Carga el objeto PetModel de Firestore para el usuario actual.
-    /// NOTA: Se ha renombrado de LoadPetAsync a LoadPetDataAsync para coincidir con la llamada en AuthService.
+    /// Carga el perfil de la mascota del usuario actual desde Firestore.
     /// </summary>
-    /// <returns>Una tupla con el PetModel, éxito y mensaje de error.</returns>
-    public async Task<(PetModel pet, bool success, string errorMessage)> LoadPetDataAsync()
+    /// <returns>
+    /// CRÍTICO: Tupla con el PetModel cargado (puede ser null), éxito (bool) y un mensaje de error (string).
+    /// </returns>
+    // CORRECCIÓN PARA EL ERROR 1: Aseguramos la definición explícita de los nombres de los elementos de la tupla.
+    public async Task<(PetModel pet, bool success, string errorMessage)> LoadPetAsync()
     {
-        // 1. Validaciones
-        if (!IsInitialized || auth?.CurrentUser == null) 
+        if (auth?.CurrentUser == null) 
             return (null, false, "Usuario no autenticado.");
         
+        if (db == null) 
+            return (null, false, "Firestore no está inicializado.");
+
         string userId = auth.CurrentUser.UserId;
 
         try
@@ -124,45 +130,48 @@ public class FirestoreService : MonoBehaviour
                 // 3. Deserialización: Convertir de Firestore Map a PetModel
                 Dictionary<string, object> petMap = snapshot.ToDictionary();
                 
-                // Usamos el serializador JSON para convertir el Dictionary (incluyendo el submap 'stats') 
-                // a nuestro objeto PetModel, lo que maneja PetStatsModel automáticamente.
+                // Usamos el serializador JSON para convertir el Dictionary a nuestro objeto PetModel
                 string json = JsonConvert.SerializeObject(petMap);
                 PetModel pet = JsonConvert.DeserializeObject<PetModel>(json);
 
                 Debug.Log($"[FirestoreService] ✅ Mascota cargada: {pet.name}");
-                return (pet, true, null);
+                // Usamos los nombres explícitos de la tupla para garantizar la coincidencia
+                return (pet: pet, success: true, errorMessage: null);
             }
             else
             {
-                return (null, false, "No se encontraron datos de mascota para este usuario.");
+                // Usamos los nombres explícitos de la tupla para garantizar la coincidencia
+                return (pet: null, success: false, errorMessage: "No se encontraron datos de mascota para este usuario.");
             }
         }
         catch (Exception e)
         {
             Debug.LogError($"[FirestoreService] ❌ Falló la carga de la mascota: {e.Message}");
-            return (null, false, $"Error al cargar de Firestore: {e.Message}");
+            // Usamos los nombres explícitos de la tupla para garantizar la coincidencia
+            return (pet: null, success: false, errorMessage: $"Error al cargar de Firestore: {e.Message}");
         }
     }
-    
-    // --- MÉTODOS DE ACTUALIZACIÓN ESPECÍFICA (Para uso futuro) ---
-    
+
     /// <summary>
-    /// Actualiza solo las estadísticas de la mascota sin tocar otros campos.
-    /// Esto es más eficiente que guardar todo el PetModel.
+    /// Actualiza solo las estadísticas anidadas de la mascota.
     /// </summary>
     /// <param name="stats">El objeto PetStatsModel con los nuevos valores.</param>
-    /// <returns>Una tupla con éxito y mensaje de error.</returns>
+    /// <returns>Una tupla con éxito (bool) y mensaje de error (string).</returns>
     public async Task<(bool success, string errorMessage)> UpdatePetStatsAsync(PetStatsModel stats)
     {
-        if (!IsInitialized || auth?.CurrentUser == null) 
-            return (false, "Servicio no inicializado o usuario no autenticado.");
+        if (auth?.CurrentUser == null) 
+            return (false, "Usuario no autenticado para actualizar estadísticas.");
         
+        if (db == null) 
+            return (false, "Firestore no está inicializado para actualizar estadísticas.");
+
         string userId = auth.CurrentUser.UserId;
 
         try
         {
-            // 1. Serializar PetStatsModel a un Map
+            // 1. Serialización del objeto anidado (PetStatsModel)
             string statsJson = JsonConvert.SerializeObject(stats);
+            // Deserialización a un diccionario que Firestore pueda usar como mapa anidado
             Dictionary<string, object> statsMap = JsonConvert.DeserializeObject<Dictionary<string, object>>(statsJson);
             
             // 2. Crear un mapa de actualización que solo apunte al campo anidado 'stats'

@@ -4,9 +4,9 @@ using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions; // Necesario para la validación Regex
 using System.Threading.Tasks;
 using System;
+using System.Collections.Generic; // Agregado por si es necesario para futuras validaciones
 
 // Script para manejar la interfaz de usuario de Login y Registro.
-// Nota: Este script ahora usa la clase 'Constants' externa.
 public class LoginUI : MonoBehaviour
 {
     // --- Referencias de UI ---
@@ -28,7 +28,6 @@ public class LoginUI : MonoBehaviour
         if (loadingPanel) loadingPanel.SetActive(false);
 
         // 2. Obtener la instancia del servicio
-        // CRÍTICO: Debe existir en la escena (ServiceInitializer)
         authService = AuthService.Instance;
         if (authService == null)
         {
@@ -42,95 +41,93 @@ public class LoginUI : MonoBehaviour
     private void SetFeedback(string message, bool isError)
     {
         if (statusLabel == null) return;
-        
         statusLabel.text = message;
-        // Rojo para errores, Blanco/Gris para mensajes informativos
-        statusLabel.color = isError ? Color.red : Color.white; 
+        // Opcional: statusLabel.color = isError ? Color.red : Color.green;
+    }
+    
+    // --- Manejo de Botones ---
+
+    public void OnLoginPressed()
+    {
+        // 1. Validación básica de inputs antes de llamar al servicio
+        if (!ValidateInputs(false)) return;
+
+        // 2. Ejecutar la acción de autenticación
+        // CRÍTICO: La función lambda ahora encapsula la llamada asíncrona y devuelve el Task esperado.
+        HandleAuthAction(() => authService.LoginAsync(emailInput.text, passwordInput.text));
     }
 
-    /// <summary>
-    /// Realiza validaciones básicas de los campos de entrada antes de llamar a Firebase.
-    /// </summary>
-    private bool ValidateInputs(string email, string password, bool isRegistration)
+    public void OnRegisterPressed()
     {
-        // 1. Campos vacíos
-        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        // 1. Validación estricta de inputs (incluyendo regex de contraseña)
+        if (!ValidateInputs(true)) return;
+
+        // 2. Ejecutar la acción de autenticación
+        // CRÍTICO: La función lambda ahora encapsula la llamada asíncrona y devuelve el Task esperado.
+        HandleAuthAction(() => authService.RegisterAsync(emailInput.text, passwordInput.text), true);
+    }
+    
+    /// <summary>
+    /// Realiza la validación de los campos de email y contraseña.
+    /// </summary>
+    private bool ValidateInputs(bool isRegistration)
+    {
+        string email = emailInput.text;
+        string password = passwordInput.text;
+
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
         {
-            SetFeedback("*Correo o Contraseña no pueden estar vacíos.", true);
+            SetFeedback("Correo y contraseña no pueden estar vacíos.", true);
             return false;
         }
 
-        // 2. Validación de formato de email (simple)
-        if (!email.Contains("@") || !email.Contains("."))
-        {
-            SetFeedback("*Por favor, ingresa un formato de correo válido.", true);
-            return false;
-        }
-
-        // 3. Validación de Longitud y Fortaleza (Solo para registro)
         if (isRegistration)
         {
-            // Validación de longitud mínima (8 caracteres)
+            // Validar la contraseña solo en registro (Firebase valida el login implícitamente)
             if (password.Length < Constants.MIN_PASSWORD_LENGTH)
             {
-                SetFeedback($"*La contraseña debe tener al menos {Constants.MIN_PASSWORD_LENGTH} caracteres.", true);
+                SetFeedback($"La contraseña debe tener al menos {Constants.MIN_PASSWORD_LENGTH} caracteres.", true);
                 return false;
             }
-            
-            // NUEVA VALIDACIÓN: Regex para Mayúscula, Minúscula y Número
+            // Validación Regex avanzada para registro
             if (!Regex.IsMatch(password, Constants.PASSWORD_REGEX))
             {
-                SetFeedback("*La contraseña debe incluir al menos 1 mayúscula, 1 minúscula y 1 número.", true);
+                SetFeedback($"La contraseña debe tener {Constants.MIN_PASSWORD_LENGTH} caracteres, 1 mayúscula, 1 minúscula y 1 número.", true);
                 return false;
             }
         }
+        
+        // Validación de formato de correo (opcional, Firebase lo valida mejor)
+        /*
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            if (addr.Address != email)
+            {
+                SetFeedback("Formato de correo inválido.", true);
+                return false;
+            }
+        }
+        catch
+        {
+            SetFeedback("Formato de correo inválido.", true);
+            return false;
+        }
+        */
 
+        SetFeedback("", false); // Limpiar feedback si pasa la validación
         return true;
     }
 
-    // --- Manejadores de Eventos de Botón (Llamados desde el Inspector) ---
-
-    public async void OnLoginPressed()
-    {
-        string email = emailInput.text;
-        string password = passwordInput.text;
-        
-        if (!ValidateInputs(email, password, false)) return;
-
-        // Llama a la lógica centralizada de ejecución de autenticación
-        await ExecuteAuthAction(() => authService.LoginAsync(email, password), false);
-    }
-
-    public async void OnRegisterPressed()
-    {
-        string email = emailInput.text;
-        string password = passwordInput.text;
-
-        if (!ValidateInputs(email, password, true)) return;
-        
-        // Llama a la lógica centralizada de ejecución de autenticación
-        await ExecuteAuthAction(() => authService.RegisterAsync(email, password), true);
-    }
-
-    public async void OnGoogleLoginPressed() 
-    { 
-        // Lógica de validación previa si es necesaria
-        await ExecuteAuthAction(() => authService.LoginWithGoogleAsync());
-    }
-
-    public async void OnFacebookLoginPressed() 
-    { 
-        // Lógica de validación previa si es necesaria
-        await ExecuteAuthAction(() => authService.LoginWithFacebookAsync());
-    }
-    
-    // --- Lógica Centralizada para Ejecutar Autenticación ---
-
-    private async Task ExecuteAuthAction(System.Func<Task<(bool success, string errorMessage)>> authFunction, bool isRegistration = false)
+    /// <summary>
+    /// Maneja la ejecución de la acción de autenticación (Login o Registro), mostrando carga y feedback.
+    /// </summary>
+    /// <param name="authFunction">Función asíncrona que llama a AuthService.LoginUser o RegisterUser.</param>
+    private async void HandleAuthAction(Func<Task<(bool success, string errorMessage)>> authFunction, bool isRegistration = false)
     {
         if (authService == null || !authService.IsInitialized)
         {
-            SetFeedback("*Servicio no listo. Intenta de nuevo luego.", true);
+            SetFeedback("Servicio no listo. Intenta de nuevo cuando Firebase esté cargado.", true);
             return;
         }
 
@@ -147,7 +144,7 @@ public class LoginUI : MonoBehaviour
         if (result.success)
         {
             Debug.Log($"[LoginUI] ✅ { (isRegistration ? "Registro" : "Login") } Exitoso");
-            SetFeedback(isRegistration ? "Registro exitoso. ¡Bienvenido!" : "¡Bienvenido de vuelta!", false);
+            SetFeedback(isRegistration ? "Registro exitoso. ¡Bienvenido! Redirigiendo..." : "¡Bienvenido de vuelta! Redirigiendo...", false);
             
             // NOTA CRÍTICA: La redirección a la escena "CreatePet" o "PetProfile"
             // ahora es manejada por el listener de AuthService.OnAuthStateChanged
