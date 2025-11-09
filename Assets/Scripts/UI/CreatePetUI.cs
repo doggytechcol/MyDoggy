@@ -39,75 +39,61 @@ public class CreatePetUI : MonoBehaviour
     private void SetFeedback(string message, bool isError)
     {
         if (statusLabel == null) return;
+        
         statusLabel.text = message;
-        statusLabel.color = isError ? Color.red : Color.white; 
+        // Cambia el color del texto si es un error
+        statusLabel.color = isError ? Color.red : Color.black; 
     }
-
+    
     /// <summary>
-    /// Valida los campos de entrada de la mascota.
+    /// Maneja la lógica al presionar el botón de "Crear Mascota".
     /// </summary>
-    private bool ValidatePetInputs(string name, string breed, string yearStr)
-    {
-        // 1. Campos vacíos
-        if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(breed) || string.IsNullOrEmpty(yearStr))
-        {
-            SetFeedback("Todos los campos (Nombre, Raza, Año) son obligatorios.", true);
-            return false;
-        }
-
-        // 2. Validación de Año de Nacimiento (Debe ser un número válido)
-        if (!int.TryParse(yearStr, out int birthYear))
-        {
-            SetFeedback("El año de nacimiento debe ser un número válido.", true);
-            return false;
-        }
-
-        // 3. Validación de Rango (El año no puede ser futuro ni demasiado antiguo)
-        int currentYear = DateTime.Now.Year;
-        if (birthYear > currentYear || birthYear < currentYear - 50) 
-        {
-            SetFeedback("Por favor, ingresa un año de nacimiento razonable.", true);
-            return false;
-        }
-
-        return true;
-    }
-
-    // --- Manejador de Eventos de Botón ---
-
     public async void OnCreatePetPressed()
     {
+        // 1. Obtener y validar datos
         string name = petNameInput.text.Trim();
         string breed = petBreedInput.text.Trim();
         string yearStr = petBirthYearInput.text.Trim();
 
-        // 1. Validación de campos
-        if (!ValidatePetInputs(name, breed, yearStr)) return;
-        
-        // 2. Pre-chequeos de servicio
-        if (AuthService.Instance == null || FirestoreService.Instance == null)
+        if (string.IsNullOrEmpty(name))
         {
-            SetFeedback("Error de servicio. Por favor, reinicia la aplicación.", true);
+            SetFeedback("El nombre de la mascota es obligatorio.", true);
             return;
         }
 
-        // 3. Chequeo de autenticación
-        if (AuthService.Instance.CurrentUserId == null)
+        if (string.IsNullOrEmpty(yearStr) || !int.TryParse(yearStr, out int birthYear))
         {
-            SetFeedback("No hay usuario autenticado. Volviendo a Login, reinicia la sesión.", true);
-            Invoke(nameof(GoToLogin), 2.0f);
+            SetFeedback("Por favor, ingresa un año de nacimiento válido (ej: 2020).", true);
             return;
         }
         
-        // 4. Ejecución de guardado
+        // Validación extra para el año de nacimiento
+        int currentYear = DateTime.Now.Year;
+        if (birthYear < 1980 || birthYear > currentYear) // Rango razonable
+        {
+            SetFeedback($"El año de nacimiento debe estar entre 1980 y {currentYear}.", true);
+            return;
+        }
+        
+        // Chequeo de sesión nuevamente, crítico antes de intentar guardar
+        if (AuthService.Instance == null || AuthService.Instance.CurrentUserId == null)
+        {
+            SetFeedback("Error de sesión. Por favor, reinicia la sesión.", true);
+            return;
+        }
+        
+        // 2. Crear modelo y guardar
         if (loadingPanel) loadingPanel.SetActive(true);
         SetFeedback("Creando y registrando a tu mascota...", false);
         
         // Crear el modelo de datos
-        int birthYear = int.Parse(yearStr);
+        // Si la raza es vacía, usamos un valor por defecto
+        if (string.IsNullOrEmpty(breed)) breed = "Desconocida";
+        
         PetModel newPet = new PetModel(name, breed, birthYear);
         
         // Llamar al servicio de Firestore para guardar
+        // CRÍTICO: El PetModel se guarda con el userId del usuario autenticado
         (bool success, string errorMessage) result = await FirestoreService.Instance.SavePetAsync(newPet);
 
         if (loadingPanel) loadingPanel.SetActive(false);
@@ -140,6 +126,6 @@ public class CreatePetUI : MonoBehaviour
     public void OnLogoutPressed()
     {
         AuthService.Instance.Logout();
-        // El OnAuthStateChanged en AuthService se encargará de la redirección a Login
+        // El OnAuthStateChanged en AuthService se encargará de redirigir a Login
     }
 }

@@ -8,4 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Boot.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/Login.unity
+    guid: 53903a6d2700d9a4e8d605af289b92a6
+  - enabled: 1
+    path: Assets/Scenes/CreatePet.unity
+    guid: 27b2105d8774f0b40ac45dd1a7bc8438
   m_configObjects: {}

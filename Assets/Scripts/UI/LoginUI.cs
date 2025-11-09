@@ -32,7 +32,7 @@ public class LoginUI : MonoBehaviour
         authService = AuthService.Instance;
         if (authService == null)
         {
-            SetFeedback("Error: Servicio de Autenticación no cargado.", true);
+            SetFeedback("*Error: Servicio de Autenticación no cargado.", true);
         }
     }
     
@@ -56,14 +56,14 @@ public class LoginUI : MonoBehaviour
         // 1. Campos vacíos
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
-            SetFeedback("Correo o Contraseña no pueden estar vacíos.", true);
+            SetFeedback("*Correo o Contraseña no pueden estar vacíos.", true);
             return false;
         }
 
         // 2. Validación de formato de email (simple)
         if (!email.Contains("@") || !email.Contains("."))
         {
-            SetFeedback("Por favor, ingresa un formato de correo válido.", true);
+            SetFeedback("*Por favor, ingresa un formato de correo válido.", true);
             return false;
         }
 
@@ -73,14 +73,14 @@ public class LoginUI : MonoBehaviour
             // Validación de longitud mínima (8 caracteres)
             if (password.Length < Constants.MIN_PASSWORD_LENGTH)
             {
-                SetFeedback($"La contraseña debe tener al menos {Constants.MIN_PASSWORD_LENGTH} caracteres.", true);
+                SetFeedback($"*La contraseña debe tener al menos {Constants.MIN_PASSWORD_LENGTH} caracteres.", true);
                 return false;
             }
             
             // NUEVA VALIDACIÓN: Regex para Mayúscula, Minúscula y Número
             if (!Regex.IsMatch(password, Constants.PASSWORD_REGEX))
             {
-                SetFeedback("La contraseña debe incluir al menos 1 mayúscula, 1 minúscula y 1 número.", true);
+                SetFeedback("*La contraseña debe incluir al menos 1 mayúscula, 1 minúscula y 1 número.", true);
                 return false;
             }
         }
@@ -130,7 +130,7 @@ public class LoginUI : MonoBehaviour
     {
         if (authService == null || !authService.IsInitialized)
         {
-            SetFeedback("Servicio no listo. Intenta de nuevo cuando Firebase esté cargado.", true);
+            SetFeedback("*Servicio no listo. Intenta de nuevo luego.", true);
             return;
         }
 
