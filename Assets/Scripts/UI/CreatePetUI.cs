@@ -3,79 +3,168 @@ using TMPro;
 using System;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
-// Script para manejar la interfaz de creación de la mascota
-// Nota: Depende de PetModel y FirestoreService, y utiliza la clase Constants.
+// Script para manejar la interfaz de creación de la mascota (Registro y Setup Inicial)
 public class CreatePetUI : MonoBehaviour
 {
     // --- Referencias de UI ---
     [Header("Input Fields")]
     public TMP_InputField petNameInput;
-    public TMP_InputField petBreedInput;
-    public TMP_InputField petBirthYearInput; 
+    public TMP_Dropdown breedCategoryDropdown; // Dropdown para la categoría (e.g., Pequeño, Mediano, Grande)
+    public TMP_Dropdown petBreedDropdown;      // Dropdown para la raza específica
+    public TMP_Dropdown petBirthYearDropdown;  // Dropdown para el año de nacimiento
+
+    [Header("Avatar & Appearance")]
+    public TMP_Text currentAvatarText; // Muestra el nombre del avatar actual (ej. 'Perro Gris')
+    private int currentAvatarIndex = 0;
+    private readonly List<string> availableAvatars = new List<string> { "Dálmata", "Labrador", "Chihuahua", "Pug", "Pastor Alemán" }; // Mock de avatares
 
     [Header("Feedback & Status")]
     public TMP_Text statusLabel;
-    public GameObject loadingPanel; 
+    public GameObject loadingPanel;
     
+    // --- Datos de Razas (Mock para el ejemplo) ---
+    private readonly Dictionary<string, List<string>> breedCategories = new Dictionary<string, List<string>>()
+    {
+        {"Pequeña", new List<string> {"Chihuahua", "Pug", "Yorkshire Terrier"}},
+        {"Mediana", new List<string> {"Beagle", "Basset Hound", "Bulldog"}},
+        {"Grande", new List<string> {"Pastor Alemán", "Golden Retriever", "Labrador Retriever"}}
+    };
+    
+    // --- Inicialización ---
+
     private void Start()
     {
         SetFeedback("", false);
         if (loadingPanel) loadingPanel.SetActive(false);
         
-        // **CRÍTICO:** Chequeo de sesión. Si el usuario llega aquí sin estar loggeado, es un error.
+        // 1. Chequeo de sesión
         if (AuthService.Instance == null || AuthService.Instance.CurrentUserId == null)
         {
             SetFeedback("Error: No hay sesión activa. Volviendo a Login.", true);
-            // Usamos Constants para la escena de Login
             Invoke(nameof(GoToLogin), 2.0f);
+            return;
         }
-        else
-        {
-            SetFeedback("¡Bienvenido! Cuéntanos sobre tu mascota.", false);
-        }
-    }
-    
-    private void SetFeedback(string message, bool isError)
-    {
-        if (statusLabel == null) return;
-        
-        statusLabel.text = message;
-        // Cambia el color del texto si es un error
-        statusLabel.color = isError ? Color.red : Color.black; 
+
+        SetFeedback("¡Bienvenido! Cuéntanos sobre tu mascota.", false);
+
+        // 2. Inicializar Dropdowns
+        InitializeBreedDropdowns();
+        InitializeBirthYearDropdown();
+        InitializeAvatarDisplay();
     }
     
     /// <summary>
-    /// Maneja la lógica al presionar el botón de "Crear Mascota".
+    /// Inicializa los dropdowns de Categoría y Raza.
+    /// </summary>
+    private void InitializeBreedDropdowns()
+    {
+        // 2.1 Llenar Dropdown de Categoría
+        breedCategoryDropdown.ClearOptions();
+        List<string> categories = new List<string>(breedCategories.Keys);
+        breedCategoryDropdown.AddOptions(categories);
+
+        // 2.2 Suscribirse al cambio de categoría para actualizar las razas
+        breedCategoryDropdown.onValueChanged.AddListener(delegate {
+            OnBreedCategoryChanged(breedCategoryDropdown.value);
+        });
+
+        // 2.3 Cargar la primera categoría de razas
+        OnBreedCategoryChanged(0);
+    }
+
+    /// <summary>
+    /// Se llama cuando se selecciona una nueva categoría de raza.
+    /// </summary>
+    public void OnBreedCategoryChanged(int index)
+    {
+        // Obtener la categoría seleccionada
+        string selectedCategory = breedCategoryDropdown.options[index].text;
+
+        // Limpiar y llenar el Dropdown de Raza
+        petBreedDropdown.ClearOptions();
+        if (breedCategories.ContainsKey(selectedCategory))
+        {
+            petBreedDropdown.AddOptions(breedCategories[selectedCategory]);
+        }
+    }
+
+    /// <summary>
+    /// Inicializa el dropdown de año de nacimiento (últimos 20 años).
+    /// </summary>
+    private void InitializeBirthYearDropdown()
+    {
+        petBirthYearDropdown.ClearOptions();
+        List<string> years = new List<string>();
+        int currentYear = DateTime.Now.Year;
+        // Permite seleccionar el año actual y los 20 años anteriores
+        for (int y = currentYear; y >= currentYear - 20; y--)
+        {
+            years.Add(y.ToString());
+        }
+        petBirthYearDropdown.AddOptions(years);
+    }
+    
+    /// <summary>
+    /// Inicializa la visualización del avatar.
+    /// </summary>
+    private void InitializeAvatarDisplay()
+    {
+        if (availableAvatars.Count > 0)
+        {
+            currentAvatarText.text = availableAvatars[currentAvatarIndex];
+        }
+    }
+
+    // --- Lógica de Botones ---
+    
+    /// <summary>
+    /// Cambia el avatar mostrado al siguiente de la lista.
+    /// </summary>
+    public void OnNextAvatarPressed()
+    {
+        currentAvatarIndex = (currentAvatarIndex + 1) % availableAvatars.Count;
+        InitializeAvatarDisplay(); // Actualiza el texto
+    }
+
+    /// <summary>
+    /// Cambia el avatar mostrado al anterior de la lista.
+    /// </summary>
+    public void OnPreviousAvatarPressed()
+    {
+        // Usamos una fórmula que funciona con el módulo para envolver hacia atrás
+        currentAvatarIndex = (currentAvatarIndex - 1 + availableAvatars.Count) % availableAvatars.Count;
+        InitializeAvatarDisplay(); // Actualiza el texto
+    }
+
+    /// <summary>
+    /// Intenta crear y guardar la mascota.
     /// </summary>
     public async void OnCreatePetPressed()
     {
-        // 1. Obtener y validar datos
+        // 1. Validación de entradas
         string name = petNameInput.text.Trim();
-        string breed = petBreedInput.text.Trim();
-        string yearStr = petBirthYearInput.text.Trim();
-
+        
         if (string.IsNullOrEmpty(name))
         {
-            SetFeedback("El nombre de la mascota es obligatorio.", true);
+            SetFeedback("El nombre de la mascota no puede estar vacío.", true);
             return;
         }
 
-        if (string.IsNullOrEmpty(yearStr) || !int.TryParse(yearStr, out int birthYear))
+        // Obtener la raza seleccionada del dropdown de raza
+        string breed = petBreedDropdown.options[petBreedDropdown.value].text;
+
+        // Obtener el año de nacimiento seleccionado (siempre es un string en el dropdown)
+        string yearStr = petBirthYearDropdown.options[petBirthYearDropdown.value].text;
+        int birthYear;
+
+        if (!int.TryParse(yearStr, out birthYear))
         {
-            SetFeedback("Por favor, ingresa un año de nacimiento válido (ej: 2020).", true);
+            SetFeedback("Error: No se pudo determinar el año de nacimiento.", true);
             return;
         }
-        
-        // Validación extra para el año de nacimiento
-        int currentYear = DateTime.Now.Year;
-        if (birthYear < 1980 || birthYear > currentYear) // Rango razonable
-        {
-            SetFeedback($"El año de nacimiento debe estar entre 1980 y {currentYear}.", true);
-            return;
-        }
-        
-        // Chequeo de sesión nuevamente, crítico antes de intentar guardar
+
         if (AuthService.Instance == null || AuthService.Instance.CurrentUserId == null)
         {
             SetFeedback("Error de sesión. Por favor, reinicia la sesión.", true);
@@ -86,14 +175,13 @@ public class CreatePetUI : MonoBehaviour
         if (loadingPanel) loadingPanel.SetActive(true);
         SetFeedback("Creando y registrando a tu mascota...", false);
         
-        // Crear el modelo de datos
-        // Si la raza es vacía, usamos un valor por defecto
-        if (string.IsNullOrEmpty(breed)) breed = "Desconocida";
-        
+        // Crear el modelo de datos (PetModel ahora incluye PetStatsModel)
         PetModel newPet = new PetModel(name, breed, birthYear);
         
+        // Opcional: Agregar el avatar seleccionado al modelo antes de guardarlo.
+        // newPet.avatarName = availableAvatars[currentAvatarIndex]; // Asumiendo que PetModel tiene 'avatarName'
+
         // Llamar al servicio de Firestore para guardar
-        // CRÍTICO: El PetModel se guarda con el userId del usuario autenticado
         (bool success, string errorMessage) result = await FirestoreService.Instance.SavePetAsync(newPet);
 
         if (loadingPanel) loadingPanel.SetActive(false);
@@ -103,9 +191,7 @@ public class CreatePetUI : MonoBehaviour
             Debug.Log("[CreatePetUI] ✅ Mascota creada y guardada exitosamente.");
             SetFeedback($"¡{name} ha sido registrada! Cargando perfil...", false);
             
-            // 5. Redirección a PetProfile (Usamos Constants)
-            // Ya que los datos se guardaron, AuthService.OnAuthStateChanged debería llevarnos a PetProfile
-            // pero cargamos la escena directamente para una transición inmediata.
+            // 3. Redirección a PetProfile (Usamos Constants)
             await Task.Delay(1000); 
             SceneManager.LoadScene(Constants.SCENE_PET_PROFILE);
         }
@@ -114,6 +200,19 @@ public class CreatePetUI : MonoBehaviour
             // Muestra el error de Firestore
             SetFeedback($"Error al crear la mascota: {result.errorMessage}", true);
         }
+    }
+    
+    // --- Funciones Auxiliares y de Estado ---
+
+    /// <summary>
+    /// Muestra un mensaje al usuario en la etiqueta de estado.
+    /// </summary>
+    private void SetFeedback(string message, bool isError)
+    {
+        if (statusLabel == null) return;
+        statusLabel.text = message;
+        // Opcional: Cambiar color del texto para indicar error o éxito.
+        // statusLabel.color = isError ? Color.red : Color.green;
     }
     
     // Método privado para la redirección de error de sesión
@@ -126,6 +225,15 @@ public class CreatePetUI : MonoBehaviour
     public void OnLogoutPressed()
     {
         AuthService.Instance.Logout();
-        // El OnAuthStateChanged en AuthService se encargará de redirigir a Login
+        // El OnAuthStateChanged de AuthService se encargará de la redirección
+        // a la escena de Login, lo cual es más robusto.
+    }
+    
+    // Puedes agregar una función para intercambiar nombre/raza si tienes un botón para eso
+    public void OnSwapNameBreedPressed()
+    {
+        // Solo como ejemplo de funcionalidad, aunque es raro.
+        // Podrías habilitar/deshabilitar campos aquí.
+        SetFeedback("Funcionalidad de intercambio de campos activa, pero no implementada.", false);
     }
 }

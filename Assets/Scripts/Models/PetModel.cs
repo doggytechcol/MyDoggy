@@ -1,12 +1,14 @@
 using System;
 using Newtonsoft.Json;
 
-// Clase POCO (Plain Old C# Object) que representa la estructura de datos
-// de la mascota tal como se guardará en Firestore.
+/// <summary>
+/// Clase POCO (Plain Old C# Object) que representa la estructura de datos
+/// de la mascota tal como se guardará en Firestore.
+/// </summary>
 [System.Serializable]
 public class PetModel
 {
-    // Datos de registro inicial
+    // --- Datos de registro inicial ---
     [JsonProperty("name")]
     public string name;
     
@@ -16,7 +18,7 @@ public class PetModel
     [JsonProperty("birthYear")]
     public int birthYear; // Usamos el año para calcular la edad
 
-    // Metadatos y estado
+    // --- Metadatos y estado ---
     [JsonProperty("creationTimestamp")]
     public long creationTimestamp; // Unix timestamp de cuándo se creó el perfil
 
@@ -27,7 +29,16 @@ public class PetModel
     [JsonProperty("xp")]
     public int xp;
 
-    // Constructor para crear nuevas instancias del modelo
+    // --- CRÍTICO: Modelo de Estadísticas Anidado (Bienestar) ---
+    [JsonProperty("stats")]
+    public PetStatsModel stats;
+
+    /// <summary>
+    /// Constructor para crear nuevas instancias del modelo.
+    /// </summary>
+    /// <param name="name">Nombre de la mascota.</param>
+    /// <param name="breed">Raza de la mascota.</param>
+    /// <param name="birthYear">Año de nacimiento (ej. 2022).</param>
     public PetModel(string name, string breed, int birthYear)
     {
         this.name = name;
@@ -38,6 +49,8 @@ public class PetModel
         // Inicialización de valores base
         this.level = 1;
         this.xp = 0;
+        // CRÍTICO: Inicialización del nuevo modelo de estadísticas de bienestar
+        this.stats = new PetStatsModel(); 
     }
     
     // Constructor vacío requerido por algunos serializadores (como Newtonsoft.Json)
