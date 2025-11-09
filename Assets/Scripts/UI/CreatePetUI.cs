@@ -48,21 +48,25 @@ public class CreatePetUI : MonoBehaviour
         LoadBreedsFromResources();
         SetupBirthdateDropdowns();
 
-        // Listeners
+        // --- LISTENERS ---
         sizeDropdown.onValueChanged.AddListener(OnSizeChanged);
         prevBreedButton.onClick.AddListener(OnPrevBreed);
         nextBreedButton.onClick.AddListener(OnNextBreed);
         createButton.onClick.AddListener(OnCreatePressed);
         logoutButton.onClick.AddListener(OnLogoutPressed);
 
+        // Hace que los toggles se desmarquen mutuamente
+        maleToggle.onValueChanged.AddListener((isOn) => { if (isOn) femaleToggle.isOn = false; });
+        femaleToggle.onValueChanged.AddListener((isOn) => { if (isOn) maleToggle.isOn = false; });
+
         // Inicializar
         OnSizeChanged(sizeDropdown.value);
     }
 
 
-    // ===============================
-    // ✅ CARGA DE RAZAS (ScriptableObject)
-    // ===============================
+    // ============================================================
+    // ✅ CARGA DE RAZAS (SCRIPTABLEOBJECTS)
+    // ============================================================
 
     private void LoadBreedsFromResources()
     {
@@ -73,9 +77,9 @@ public class CreatePetUI : MonoBehaviour
     }
 
 
-    // ===============================
-    // ✅ CONFIGURACIÓN DE FECHA
-    // ===============================
+    // ============================================================
+    // ✅ CONFIGURAR FECHA DE NACIMIENTO
+    // ============================================================
 
     private void SetupBirthdateDropdowns()
     {
@@ -100,11 +104,11 @@ public class CreatePetUI : MonoBehaviour
     }
 
 
-    // ===============================
-    // ✅ CAMBIO DE CATEGORÍA (TAMAÑO)
-    // ===============================
+    // ============================================================
+    // ✅ CAMBIO DE CATEGORÍA (PEQUEÑO / MEDIANO / GRANDE / GIGANTE)
+    // ============================================================
 
-    private void OnSizeChanged(int index)
+    public void OnSizeChanged(int index)
     {
         switch (index)
         {
@@ -121,11 +125,11 @@ public class CreatePetUI : MonoBehaviour
     }
 
 
-    // ===============================
-    // ✅ NAVEGACIÓN ENTRE RAZAS
-    // ===============================
+    // ============================================================
+    // ✅ BOTONES DE NAVEGACIÓN (SIGUIENTE / ANTERIOR)
+    // ============================================================
 
-    private void OnPrevBreed()
+    public void OnPrevBreed()
     {
         if (currentBreedList == null || currentBreedList.Count == 0) return;
 
@@ -135,7 +139,7 @@ public class CreatePetUI : MonoBehaviour
         UpdateBreedDisplay();
     }
 
-    private void OnNextBreed()
+    public void OnNextBreed()
     {
         if (currentBreedList == null || currentBreedList.Count == 0) return;
 
@@ -146,15 +150,15 @@ public class CreatePetUI : MonoBehaviour
     }
 
 
-    // ===============================
-    // ✅ ACTUALIZAR PANTALLA (RAZA + AVATAR)
-    // ===============================
+    // ============================================================
+    // ✅ MOSTRAR RAZA Y AVATAR ACTUAL
+    // ============================================================
 
     private void UpdateBreedDisplay()
     {
         if (currentBreedList == null || currentBreedList.Count == 0)
         {
-            breedNameLabel.text = "Sin razas disponibles";
+            breedNameLabel.text = "Sin razas";
             avatarDisplay.sprite = null;
             return;
         }
@@ -162,6 +166,7 @@ public class CreatePetUI : MonoBehaviour
         var breed = currentBreedList[currentBreedIndex];
         breedNameLabel.text = breed.breedName;
 
+        // Validación de avatares
         if (breed.avatars == null || breed.avatars.Count == 0)
         {
             avatarDisplay.sprite = null;
@@ -175,24 +180,21 @@ public class CreatePetUI : MonoBehaviour
     }
 
 
-    // ===============================
+    // ============================================================
     // ✅ CREAR MASCOTA
-    // ===============================
+    // ============================================================
 
     public async void OnCreatePressed()
     {
-        // Nombre
         string petName = petNameInput.text.Trim();
         if (string.IsNullOrEmpty(petName))
         {
-            Debug.LogWarning("⚠ Debes escribir un nombre para tu mascota.");
+            Debug.LogWarning("⚠ Debes escribir un nombre.");
             return;
         }
 
-        // Género
         string gender = maleToggle.isOn ? "male" : "female";
 
-        // Raza
         if (currentBreedList == null || currentBreedList.Count == 0)
         {
             Debug.LogError("⚠ No hay razas cargadas.");
@@ -209,7 +211,6 @@ public class CreatePetUI : MonoBehaviour
 
         string avatarId = breed.avatars[currentAvatarIndex].id;
 
-        // Fecha de nacimiento
         int day = int.Parse(dayDropdown.options[dayDropdown.value].text);
         int month = int.Parse(monthDropdown.options[monthDropdown.value].text);
         int year = int.Parse(yearDropdown.options[yearDropdown.value].text);
@@ -217,22 +218,18 @@ public class CreatePetUI : MonoBehaviour
         DateTime birth = new DateTime(year, month, day);
         if (birth > DateTime.Now)
         {
-            Debug.LogError("⚠ No puedes elegir una fecha futura.");
+            Debug.LogError("⚠ Fecha futura inválida.");
             return;
         }
 
-        // Crear modelo
         PetModel pet = new PetModel(
             petName,
             breed.breedName,
             gender,
             avatarId,
-            day,
-            month,
-            year
+            day, month, year
         );
 
-        // Guardar en Firestore
         await FirestoreService.Instance.SavePetAsync(pet);
 
         Debug.Log("✅ Mascota creada correctamente");
@@ -241,11 +238,11 @@ public class CreatePetUI : MonoBehaviour
     }
 
 
-    // ===============================
+    // ============================================================
     // ✅ LOGOUT
-    // ===============================
+    // ============================================================
 
-    private void OnLogoutPressed()
+    public void OnLogoutPressed()
     {
         AuthService.Instance.Logout();
     }
