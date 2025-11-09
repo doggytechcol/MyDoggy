@@ -314,8 +314,8 @@ MonoBehaviour:
   introductionText: {fileID: 1794610288}
   introPanel: {fileID: 971928717}
   introDuration: 8
-  authServicePrefab: {fileID: 5908544774542315210, guid: 565872a8f692f9c4a909f26a484426ea, type: 3}
-  firestoreServicePrefab: {fileID: 5467246249841755724, guid: 13fb6abe256ac6449a8057ba4dc08396, type: 3}
+  authServicePrefab: {fileID: 2978492193531657042, guid: 565872a8f692f9c4a909f26a484426ea, type: 3}
+  firestoreServicePrefab: {fileID: 3149038769554735831, guid: e88030ba0af0cd74ab0741ac0feac1b7, type: 3}
 --- !u!4 &878663765
 Transform:
   m_ObjectHideFlags: 0

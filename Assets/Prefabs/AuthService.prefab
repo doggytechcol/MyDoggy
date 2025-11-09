@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5908544774542315210
+--- !u!1 &2978492193531657042
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,8 +8,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 158213801380640482}
-  - component: {fileID: 2197317354039910118}
+  - component: {fileID: 6980703469940565022}
+  - component: {fileID: 1487084590212949667}
   m_Layer: 0
   m_Name: AuthService
   m_TagString: Untagged
@@ -17,13 +17,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &158213801380640482
+--- !u!4 &6980703469940565022
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5908544774542315210}
+  m_GameObject: {fileID: 2978492193531657042}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 796.5908, y: 1071.168, z: -9.053571}
@@ -32,16 +32,16 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2197317354039910118
+--- !u!114 &1487084590212949667
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5908544774542315210}
+  m_GameObject: {fileID: 2978492193531657042}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2cee0b9dbc0effc498c49b0671c38be1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firestoreService: {fileID: 0}
+  firestoreService: {fileID: 6778825991060124605, guid: e88030ba0af0cd74ab0741ac0feac1b7, type: 3}
