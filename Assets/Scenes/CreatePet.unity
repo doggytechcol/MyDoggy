@@ -1678,19 +1678,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 391427240}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 427445981}
-        m_TargetAssemblyTypeName: CreatePetUI, Assembly-CSharp
-        m_MethodName: OnLogoutPressed
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &391427240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1903,8 +1891,9 @@ MonoBehaviour:
   sizeDropdown: {fileID: 1739616036}
   breedNameLabel: {fileID: 1122437448}
   avatarDisplay: {fileID: 1956580228}
-  prevBreedButton: {fileID: 0}
-  nextBreedButton: {fileID: 0}
+  prevBreedButton: {fileID: 804175483}
+  nextBreedButton: {fileID: 2037080813}
+  variantDropdown: {fileID: 1488759371}
   maleToggle: {fileID: 1783156612}
   femaleToggle: {fileID: 1023573087}
   dayDropdown: {fileID: 836420213}
@@ -3119,19 +3108,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 804175484}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 427445981}
-        m_TargetAssemblyTypeName: CreatePetUI, Assembly-CSharp
-        m_MethodName: OnPrevBreed
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &804175484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8632,19 +8609,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2037080814}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 427445981}
-        m_TargetAssemblyTypeName: CreatePetUI, Assembly-CSharp
-        m_MethodName: OnNextBreed
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &2037080814
 MonoBehaviour:
   m_ObjectHideFlags: 0

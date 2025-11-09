@@ -18,6 +18,9 @@ public class CreatePetUI : MonoBehaviour
     public Button prevBreedButton;
     public Button nextBreedButton;
 
+    [Header("Variant Selector")]
+    public TMP_Dropdown variantDropdown;   // ✅ NUEVO
+
     [Header("Gender")]
     public Toggle maleToggle;
     public Toggle femaleToggle;
@@ -48,21 +51,20 @@ public class CreatePetUI : MonoBehaviour
         LoadBreedsFromResources();
         SetupBirthdateDropdowns();
 
-        // --- LISTENERS ---
+        // LISTENERS
         sizeDropdown.onValueChanged.AddListener(OnSizeChanged);
         prevBreedButton.onClick.AddListener(OnPrevBreed);
         nextBreedButton.onClick.AddListener(OnNextBreed);
+        variantDropdown.onValueChanged.AddListener(OnVariantChanged);  // ✅ NUEVO
         createButton.onClick.AddListener(OnCreatePressed);
         logoutButton.onClick.AddListener(OnLogoutPressed);
 
-        // Hace que los toggles se desmarquen mutuamente
+        // Toggle group manual
         maleToggle.onValueChanged.AddListener((isOn) => { if (isOn) femaleToggle.isOn = false; });
         femaleToggle.onValueChanged.AddListener((isOn) => { if (isOn) maleToggle.isOn = false; });
 
-        // Inicializar
         OnSizeChanged(sizeDropdown.value);
     }
-
 
     // ============================================================
     // ✅ CARGA DE RAZAS (SCRIPTABLEOBJECTS)
@@ -76,36 +78,32 @@ public class CreatePetUI : MonoBehaviour
         giantBreeds = new List<BreedDefinition>(Resources.LoadAll<BreedDefinition>("Breeds/Giant"));
     }
 
-
     // ============================================================
-    // ✅ CONFIGURAR FECHA DE NACIMIENTO
+    // ✅ CONFIGURAR FECHA
     // ============================================================
 
     private void SetupBirthdateDropdowns()
     {
-        // Día
         dayDropdown.ClearOptions();
-        List<string> days = new List<string>();
+        monthDropdown.ClearOptions();
+        yearDropdown.ClearOptions();
+
+        List<string> days = new();
         for (int d = 1; d <= 31; d++) days.Add(d.ToString());
         dayDropdown.AddOptions(days);
 
-        // Mes
-        monthDropdown.ClearOptions();
-        List<string> months = new List<string>();
+        List<string> months = new();
         for (int m = 1; m <= 12; m++) months.Add(m.ToString());
         monthDropdown.AddOptions(months);
 
-        // Año
-        yearDropdown.ClearOptions();
-        List<string> years = new List<string>();
+        List<string> years = new();
         int currentYear = DateTime.Now.Year;
         for (int y = currentYear; y >= currentYear - 25; y--) years.Add(y.ToString());
         yearDropdown.AddOptions(years);
     }
 
-
     // ============================================================
-    // ✅ CAMBIO DE CATEGORÍA (PEQUEÑO / MEDIANO / GRANDE / GIGANTE)
+    // ✅ CAMBIO DE TAMAÑO
     // ============================================================
 
     public void OnSizeChanged(int index)
@@ -124,9 +122,8 @@ public class CreatePetUI : MonoBehaviour
         UpdateBreedDisplay();
     }
 
-
     // ============================================================
-    // ✅ BOTONES DE NAVEGACIÓN (SIGUIENTE / ANTERIOR)
+    // ✅ CAMBIO DE RAZA (PREV / NEXT)
     // ============================================================
 
     public void OnPrevBreed()
@@ -135,7 +132,6 @@ public class CreatePetUI : MonoBehaviour
 
         currentBreedIndex = (currentBreedIndex - 1 + currentBreedList.Count) % currentBreedList.Count;
         currentAvatarIndex = 0;
-
         UpdateBreedDisplay();
     }
 
@@ -145,13 +141,36 @@ public class CreatePetUI : MonoBehaviour
 
         currentBreedIndex = (currentBreedIndex + 1) % currentBreedList.Count;
         currentAvatarIndex = 0;
-
         UpdateBreedDisplay();
     }
 
+    // ============================================================
+    // ✅ CAMBIO DE VARIANTE DEL AVATAR
+    // ============================================================
+
+    public void OnVariantChanged(int index)
+    {
+        currentAvatarIndex = index;
+        UpdateAvatarDisplay();
+    }
+
+    private void PopulateVariantDropdown(BreedDefinition breed)
+    {
+        variantDropdown.ClearOptions();
+
+        List<string> names = new List<string>();
+        foreach (var avatar in breed.avatars)
+            names.Add(avatar.id); // Nombre visible → ID del avatar
+
+        variantDropdown.AddOptions(names);
+
+        currentAvatarIndex = 0;
+        variantDropdown.value = 0;
+        variantDropdown.RefreshShownValue();
+    }
 
     // ============================================================
-    // ✅ MOSTRAR RAZA Y AVATAR ACTUAL
+    // ✅ ACTUALIZAR RAZA Y VARIANTE
     // ============================================================
 
     private void UpdateBreedDisplay()
@@ -166,19 +185,28 @@ public class CreatePetUI : MonoBehaviour
         var breed = currentBreedList[currentBreedIndex];
         breedNameLabel.text = breed.breedName;
 
-        // Validación de avatares
         if (breed.avatars == null || breed.avatars.Count == 0)
         {
             avatarDisplay.sprite = null;
             return;
         }
 
-        if (currentAvatarIndex >= breed.avatars.Count)
-            currentAvatarIndex = 0;
+        // ✅ llenar el dropdown
+        PopulateVariantDropdown(breed);
+
+        // ✅ mostrar avatar inicial
+        UpdateAvatarDisplay();
+    }
+
+    private void UpdateAvatarDisplay()
+    {
+        var breed = currentBreedList[currentBreedIndex];
+
+        if (breed.avatars == null || breed.avatars.Count == 0) return;
+        if (currentAvatarIndex >= breed.avatars.Count) currentAvatarIndex = 0;
 
         avatarDisplay.sprite = breed.avatars[currentAvatarIndex].sprite;
     }
-
 
     // ============================================================
     // ✅ CREAR MASCOTA
@@ -195,19 +223,7 @@ public class CreatePetUI : MonoBehaviour
 
         string gender = maleToggle.isOn ? "male" : "female";
 
-        if (currentBreedList == null || currentBreedList.Count == 0)
-        {
-            Debug.LogError("⚠ No hay razas cargadas.");
-            return;
-        }
-
         var breed = currentBreedList[currentBreedIndex];
-
-        if (breed.avatars.Count == 0)
-        {
-            Debug.LogError("⚠ La raza seleccionada no tiene avatares.");
-            return;
-        }
 
         string avatarId = breed.avatars[currentAvatarIndex].id;
 
@@ -236,7 +252,6 @@ public class CreatePetUI : MonoBehaviour
 
         UnityEngine.SceneManagement.SceneManager.LoadScene("PetProfile");
     }
-
 
     // ============================================================
     // ✅ LOGOUT
