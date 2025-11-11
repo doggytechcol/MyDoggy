@@ -85,7 +85,7 @@ public class AuthService : MonoBehaviour
             if (petResult.success && petResult.pet != null)
             {
                 Debug.Log("[AuthService] Mascota encontrada. Redirigiendo a PetProfile.");
-                StartCoroutine(RedirectToScene(Constants.SCENE_PET_PROFILE));
+                StartCoroutine(RedirectToScene(Constants.SCENE_MAP));
             }
             else
             {
