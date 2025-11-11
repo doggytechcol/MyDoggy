@@ -96,24 +96,7 @@ public class LoginUI : MonoBehaviour
                 return false;
             }
         }
-        
-        // Validación de formato de correo (opcional, Firebase lo valida mejor)
-        /*
-        try
-        {
-            var addr = new System.Net.Mail.MailAddress(email);
-            if (addr.Address != email)
-            {
-                SetFeedback("Formato de correo inválido.", true);
-                return false;
-            }
-        }
-        catch
-        {
-            SetFeedback("Formato de correo inválido.", true);
-            return false;
-        }
-        */
+
 
         SetFeedback("", false); // Limpiar feedback si pasa la validación
         return true;
@@ -127,7 +110,7 @@ public class LoginUI : MonoBehaviour
     {
         if (authService == null || !authService.IsInitialized)
         {
-            SetFeedback("Servicio no listo. Intenta de nuevo cuando Firebase esté cargado.", true);
+            SetFeedback("Servicio no listo. Intenta de nuevo.", true);
             return;
         }
 
@@ -145,11 +128,7 @@ public class LoginUI : MonoBehaviour
         {
             Debug.Log($"[LoginUI] ✅ { (isRegistration ? "Registro" : "Login") } Exitoso");
             SetFeedback(isRegistration ? "Registro exitoso. ¡Bienvenido! Redirigiendo..." : "¡Bienvenido de vuelta! Redirigiendo...", false);
-            
-            // NOTA CRÍTICA: La redirección a la escena "CreatePet" o "PetProfile"
-            // ahora es manejada por el listener de AuthService.OnAuthStateChanged
-            // para evitar errores de doble salto o condiciones de carrera.
-            
+
         }
         else
         {

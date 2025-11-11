@@ -19,7 +19,7 @@ public class CreatePetUI : MonoBehaviour
     public Button nextBreedButton;
 
     [Header("Variant Selector")]
-    public TMP_Dropdown variantDropdown;   // ✅ NUEVO
+    public TMP_Dropdown variantDropdown;   
 
     [Header("Gender")]
     public Toggle maleToggle;
@@ -55,7 +55,7 @@ public class CreatePetUI : MonoBehaviour
         sizeDropdown.onValueChanged.AddListener(OnSizeChanged);
         prevBreedButton.onClick.AddListener(OnPrevBreed);
         nextBreedButton.onClick.AddListener(OnNextBreed);
-        variantDropdown.onValueChanged.AddListener(OnVariantChanged);  // ✅ NUEVO
+        variantDropdown.onValueChanged.AddListener(OnVariantChanged);  
         createButton.onClick.AddListener(OnCreatePressed);
         logoutButton.onClick.AddListener(OnLogoutPressed);
 
@@ -250,7 +250,7 @@ public class CreatePetUI : MonoBehaviour
 
         Debug.Log("✅ Mascota creada correctamente");
 
-        UnityEngine.SceneManagement.SceneManager.LoadScene("PetProfile");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Map");
     }
 
     // ============================================================

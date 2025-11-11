@@ -76,7 +76,7 @@ public class FirestoreService : MonoBehaviour
             return (false, "Usuario no autenticado para guardar.");
         
         if (db == null) 
-            return (false, "Firestore no está inicializado para guardar.");
+            return (false, "Base de datos no iniciada, no es posible guardar.");
 
         string userId = auth.CurrentUser.UserId;
 

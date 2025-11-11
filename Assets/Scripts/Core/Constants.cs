@@ -7,6 +7,7 @@ public static class Constants
     public const string SCENE_BOOT = "Boot";
     public const string SCENE_LOGIN = "Login";
     public const string SCENE_CREATE_PET = "CreatePet";
+    public const string SCENE_MAP = "Map";
     public const string SCENE_PET_PROFILE = "PetProfile";
 
     // --- Validación ---
