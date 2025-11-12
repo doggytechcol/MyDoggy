@@ -12,7 +12,20 @@
           "package_name": "com.doggytech.mydoggy"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "671856043241-4ghmq2tm2j670u7i0j2q0bcr0has2a53.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.doggytech.mydoggy",
+            "certificate_hash": "fc44dc6ee5ed00279e97b80c230ee9ac1353cbeb"
+          }
+        },
+        {
+          "client_id": "671856043241-h1e59bk5t3rplie4levtitkgms3avtun.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBrVlp1Sw4BsuZ8WYIj2C8UppjI93uZ5zI"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "671856043241-h1e59bk5t3rplie4levtitkgms3avtun.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

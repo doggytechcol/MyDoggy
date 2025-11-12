@@ -1,5 +1,14 @@
 <dependencies>
   <packages>
+    <package>com.android.support:appcompat-v7:25.3.1</package>
+    <package>com.android.support:cardview-v7:25.3.1</package>
+    <package>com.android.support:customtabs:25.3.1</package>
+    <package>com.android.support:support-v4:25.3.1</package>
+    <package>com.facebook.android:facebook-applinks:[16.0,17)</package>
+    <package>com.facebook.android:facebook-core:[16.0,17)</package>
+    <package>com.facebook.android:facebook-gamingservices:[16.0,17)</package>
+    <package>com.facebook.android:facebook-login:[16.0,17)</package>
+    <package>com.facebook.android:facebook-share:[16.0,17)</package>
     <package>com.google.android.gms:play-services-base:18.9.0</package>
     <package>com.google.firebase:firebase-analytics:23.0.0</package>
     <package>com.google.firebase:firebase-analytics-unity:13.5.0</package>
@@ -29,6 +38,7 @@
     <package>com.google.firebase:firebase-storage:22.0.1</package>
     <package>com.google.firebase:firebase-storage-unity:13.5.0</package>
     <package>com.google.flatbuffers:flatbuffers-java:1.12.0</package>
+    <package>com.parse.bolts:bolts-android:1.4.0</package>
   </packages>
   <files>
     <file>Assets/GeneratedLocalRepo/Firebase/m2repository/com/google/firebase/firebase-analytics-unity/13.5.0/firebase-analytics-unity-13.5.0.aar</file>
