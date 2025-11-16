@@ -1,0 +1,12 @@
+*.unity meta text eol=lf
+*.prefab meta text eol=lf
+*.asset meta text eol=lf
+*.mat meta text eol=lf
+Assets/Firebase/Plugins/**/*.bundle filter=lfs diff=lfs merge=lfs -text
+Assets/Firebase/Plugins/**/*.so filter=lfs diff=lfs merge=lfs -text
+*.bundle filter=lfs diff=lfs merge=lfs -text
+*.aar filter=lfs diff=lfs merge=lfs -text
+*.so filter=lfs diff=lfs merge=lfs -text
+*.dll filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text
+*.unitypackage filter=lfs diff=lfs merge=lfs -text

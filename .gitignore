@@ -1,0 +1,31 @@
+# Archivos de la build y caché de Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Bb]uild/
+[Bb]uilds/
+[Pp]ackages/package-lock.json
+
+# Archivos de proyecto y solución de C#
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+.DS_Store
+
+# Cache de Visual Studio y VS Code (CRÍTICO)
+.vs/
+.vscode/
+
+# Binarios de Firebase (Se gestionan por LFS, pero se ignoran si fallan)
+Assets/Firebase/Plugins/x86_64/*.bundle
+Assets/Firebase/Plugins/x86_64/*.so
