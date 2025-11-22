@@ -63,20 +63,29 @@ public class AuthService : MonoBehaviour
     }
 
     // ===============================================================
-    // AUTH STATE CHANGED
+    // 🔥 AUTH STATE CHANGED
     // ===============================================================
 
     private async void OnAuthStateChanged(object sender, EventArgs eventArgs)
     {
-        if (!firebaseReady || isRedirecting) return;
+        if (!firebaseReady) return;
+
+#if UNITY_ANDROID
+        // 🔥 Fix fundamental para que Android espere a que Firebase termine la vinculación de sesión
+        await Task.Delay(400);
+#endif
+
+        if (isRedirecting) return;
 
         FirebaseUser user = auth.CurrentUser;
 
         // ------------------------------------------------------------
-        //  NO AUTENTICADO
+        // ❌ NO AUTENTICADO
         // ------------------------------------------------------------
         if (user == null)
         {
+            Debug.Log("[Auth] Usuario no autenticado → Login");
+
             if (SceneManager.GetActiveScene().name != Constants.SCENE_LOGIN)
                 StartCoroutine(RedirectToScene(Constants.SCENE_LOGIN));
 
@@ -84,29 +93,32 @@ public class AuthService : MonoBehaviour
         }
 
         // ------------------------------------------------------------
-        // AUTENTICADO
+        // ✔️ AUTENTICADO
         // ------------------------------------------------------------
-        Debug.Log($"[AuthService] Usuario autenticado: {user.UserId}");
+        Debug.Log($"[Auth] Usuario autenticado: {user.UserId}");
 
-        // Asegurar Firestore
         if (firestoreService == null)
         {
             Debug.LogError("[Auth] ❌ FirestoreService es NULL en el Inspector.");
             return;
         }
 
+        // Inicializar Firestore si no está listo
         if (!firestoreService.IsInitialized)
         {
             firestoreService.InitializeFirestore();
             if (!firestoreService.IsInitialized)
             {
-                Debug.LogError("[Auth] ❌ Firestore NO logró inicializarse.");
+                Debug.LogError("[Auth] ❌ Firestore no logró inicializarse.");
                 return;
             }
         }
 
+        // 🔥 Fix permisos Firestore
+        firestoreService.SetUser(user);
+
         // ------------------------------------------------------------
-        // Cargar mascota
+        // 🔄 Intentar cargar mascota
         // ------------------------------------------------------------
         var petResult = await firestoreService.LoadPetAsync();
 
@@ -119,13 +131,13 @@ public class AuthService : MonoBehaviour
 
         if (petResult.pet == null)
         {
-            Debug.Log("[Auth] Usuario sin mascota → CreatePet.");
+            Debug.Log("[Auth] Usuario sin mascota → CreatePet");
             StartCoroutine(RedirectToScene(Constants.SCENE_CREATE_PET));
             return;
         }
 
         // ------------------------------------------------------------
-        // Mascota existe → decidir escena a cargar
+        // ✔️ Mascota existente → decidir escena
         // ------------------------------------------------------------
         string sceneToLoad = Constants.SCENE_MAP;
 
@@ -136,14 +148,14 @@ public class AuthService : MonoBehaviour
         }
         else
         {
-            Debug.Log("[Auth] Mascota existe pero sin lastScene → Map.");
+            Debug.Log("[Auth] Mascota existe pero sin lastScene → Map");
         }
 
         StartCoroutine(RedirectToScene(sceneToLoad));
     }
 
     // ===============================================================
-    // 🔄 REDIRECT (SIN LOADER, SOLO UNITY)
+    // 🔄 REDIRECT (SIN LOADER)
     // ===============================================================
 
     private IEnumerator RedirectToScene(string sceneName)
@@ -152,7 +164,6 @@ public class AuthService : MonoBehaviour
 
         yield return new WaitForSeconds(0.05f);
 
-        // 🟣 Eliminamos toda referencia al SceneLoadingController
         SceneManager.LoadScene(sceneName);
 
         isRedirecting = false;
@@ -201,7 +212,7 @@ public class AuthService : MonoBehaviour
         try
         {
             await auth.SendPasswordResetEmailAsync(email);
-            Debug.Log($"[AuthService] 📩 Email de recuperación enviado a: {email}");
+            Debug.Log($"[Auth] Email de recuperación enviado: {email}");
             return (true, null);
         }
         catch (Exception e)

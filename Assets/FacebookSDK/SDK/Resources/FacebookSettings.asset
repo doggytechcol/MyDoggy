@@ -24,10 +24,10 @@ MonoBehaviour:
   status: 1
   xfbml: 0
   frictionlessRequests: 1
-  androidKeystorePath: D:\GamesDev\Fundamentals\mydoggy-key.keystore
+  androidKeystorePath: 
   iosURLSuffix: 
   appLinkSchemes:
   - list: []
   uploadAccessToken: 
-  autoLogAppEventsEnabled: 1
+  autoLogAppEventsEnabled: 0
   advertiserIDCollectionEnabled: 1

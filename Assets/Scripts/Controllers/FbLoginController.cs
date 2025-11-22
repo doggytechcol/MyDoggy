@@ -33,41 +33,30 @@ public class SocialLoginController : MonoBehaviour
     {
         if (FB.IsInitialized)
         {
-            // 🔥 AHORA SÍ — SOLO DESPUÉS DE ESTAR INICIALIZADO
-            FB.Mobile.SetAutoLogAppEventsEnabled(false);
-            FB.Mobile.SetAdvertiserIDCollectionEnabled(false);
-
             FB.ActivateApp();
             Debug.Log("[Facebook] SDK Inicializado correctamente.");
         }
         else
         {
-            Debug.LogError("[Facebook] ❌ Falló la inicialización del SDK.");
+            Debug.LogError("[Facebook] No se pudo inicializar el SDK.");
         }
     }
 
-    private void OnHideUnity(bool isGameShown)
-    {
-        // opcional
-    }
+    private void OnHideUnity(bool isGameShown) { }
 
     public void OnFacebookSignInClicked()
     {
         if (AuthService.Instance == null || !AuthService.Instance.IsInitialized)
         {
-            Debug.LogError("[Facebook] Firebase todavía no está inicializado.");
-            return;
-        }
-
-        if (!FB.IsInitialized)
-        {
-            Debug.LogError("[Facebook] El SDK no está inicializado.");
+            Debug.LogWarning("[Facebook] Firebase no está listo. Reintentando...");
             return;
         }
 
         facebookSignInButton.interactable = false;
 
-        var permissions = new List<string>() { "public_profile", "email" };
+        // ⚡ Importante: solo public_profile
+        var permissions = new List<string>() { "public_profile" };
+
         FB.LogInWithReadPermissions(permissions, HandleFacebookLoginResult);
     }
 
@@ -77,40 +66,44 @@ public class SocialLoginController : MonoBehaviour
 
         if (result == null)
         {
-            Debug.LogError("[Facebook] ❌ Resultado nulo.");
+            Debug.LogError("[Facebook] Resultado nulo.");
             return;
         }
 
         if (result.Cancelled)
         {
-            Debug.Log("[Facebook] Login cancelado.");
+            Debug.Log("[Facebook] Login cancelado por el usuario.");
             return;
         }
 
-        if (result.Error != null)
+        if (!string.IsNullOrEmpty(result.Error))
         {
-            Debug.LogError("[Facebook] ❌ Error Login: " + result.Error);
+            Debug.LogError("[Facebook] Error de login: " + result.Error);
             return;
         }
 
         if (!FB.IsLoggedIn)
         {
-            Debug.LogError("[Facebook] ❌ No se consiguió iniciar sesión.");
+            Debug.LogError("[Facebook] FB.IsLoggedIn es falso.");
             return;
         }
 
-        string facebookAccessToken = AccessToken.CurrentAccessToken.TokenString;
-        Debug.Log("[Facebook] Access Token: " + facebookAccessToken);
+        // ⚡ SDK 18: AccessToken viene en result
+        string facebookAccessToken = result.AccessToken.TokenString;
+        Debug.Log("[Facebook] Access Token obtenido.");
 
-        facebookSignInButton.interactable = false;
+        await Task.Delay(300);
 
         var authResult = await AuthService.Instance.FacebookLoginAsync(facebookAccessToken);
 
-        facebookSignInButton.interactable = true;
-
         if (!authResult.success)
         {
-            Debug.LogError("[Facebook] ❌ Error Firebase: " + authResult.errorMessage);
+            Debug.LogError("[Facebook] Error autenticando con Firebase: " + authResult.errorMessage);
+            return;
         }
+
+        Debug.Log("[Facebook] Login COMPLETO. Firebase autenticó correctamente.");
     }
 }
+
+

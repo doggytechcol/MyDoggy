@@ -17,6 +17,10 @@ public class FirestoreService : MonoBehaviour
 
     private const string PETS_COLLECTION = "pets";
 
+    // 🔥 Cache del ID de usuario (evita errores en Android)
+    private string cachedUserId = null;
+
+
     private void Awake()
     {
         if (Instance == null)
@@ -29,6 +33,23 @@ public class FirestoreService : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+
+    // ============================================================
+    // 🔥 NUEVO: SetUser() para sincronizar AuthService → Firestore
+    // ============================================================
+    public void SetUser(FirebaseUser user)
+    {
+        if (user == null)
+        {
+            cachedUserId = null;
+            return;
+        }
+
+        cachedUserId = user.UserId;
+        Debug.Log("[Firestore] Usuario sincronizado: " + cachedUserId);
+    }
+
 
     public void InitializeFirestore()
     {
@@ -56,12 +77,36 @@ public class FirestoreService : MonoBehaviour
     }
 
 
+    // ============================================================
+    // 🔥 Helper: Obtener UID seguro (cacheado)
+    // ============================================================
+    private string GetUserIdSafe()
+    {
+        // 1) Preferir UID cacheado por AuthService
+        if (!string.IsNullOrEmpty(cachedUserId))
+            return cachedUserId;
+
+        // 2) Intentar leer desde FirebaseAuth
+        if (auth != null && auth.CurrentUser != null)
+        {
+            cachedUserId = auth.CurrentUser.UserId;
+            return cachedUserId;
+        }
+
+        return null;
+    }
+
+
+    // ============================================================
+    // SAVE PET
+    // ============================================================
+
     public async Task<(bool success, string errorMessage)> SavePetAsync(PetModel pet)
     {
         if (!IsInitialized) return (false, "Firestore no está inicializado.");
-        if (auth.CurrentUser == null) return (false, "Usuario no autenticado.");
 
-        string userId = auth.CurrentUser.UserId;
+        string userId = GetUserIdSafe();
+        if (userId == null) return (false, "Usuario no autenticado.");
 
         try
         {
@@ -78,61 +123,58 @@ public class FirestoreService : MonoBehaviour
         }
     }
 
+
+    // ============================================================
+    // LOAD PET
+    // ============================================================
+
     public async Task<(PetModel pet, bool success, string errorMessage)> LoadPetAsync()
     {
-        if (auth?.CurrentUser == null)
+        string userId = GetUserIdSafe();
+        if (userId == null)
             return (null, false, "Usuario no autenticado.");
 
         if (db == null)
             return (null, false, "Firestore no inicializado.");
 
-        string userId = auth.CurrentUser.UserId;
-
         try
         {
-            DocumentReference docRef = db.Collection("pets").Document(userId);
+            DocumentReference docRef = db.Collection(PETS_COLLECTION).Document(userId);
             DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
 
             if (!snapshot.Exists)
             {
-                return (null, false, "Documento no existe.");
+                return (null, true, "Documento no existe.");
             }
 
-            // --- Protección CRÍTICA: snapshot.ToDictionary() puede retornar null ---
             var petMap = snapshot.ToDictionary();
-
             if (petMap == null || petMap.Count == 0)
             {
-                Debug.LogWarning("[Firestore] Documento existe pero esta vacio.");
-                return (null, false, "Datos de mascota vacios.");
+                return (null, true, "Datos vacíos.");
             }
 
-            // Convertimos dict → JSON → PetModel de forma segura
             string json = JsonConvert.SerializeObject(petMap);
             var pet = JsonConvert.DeserializeObject<PetModel>(json);
-
-            if (pet == null)
-            {
-                Debug.LogError("[Firestore] Fallo al deserializar PetModel.");
-                return (null, false, "Error al leer datos.");
-            }
 
             return (pet, true, null);
         }
         catch (Exception e)
         {
-            Debug.LogError($"[Firestore] Error al cargar mascota: {e.Message}");
-            return (null, false, "Excepcion: " + e.Message);
+            return (null, false, "Excepción: " + e.Message);
         }
     }
 
 
+    // ============================================================
+    // UPDATE PET STATS
+    // ============================================================
+
     public async Task<(bool success, string errorMessage)> UpdatePetStatsAsync(PetStatsModel stats)
     {
         if (!IsInitialized) return (false, "Firestore no está inicializado.");
-        if (auth.CurrentUser == null) return (false, "Usuario no autenticado.");
 
-        string userId = auth.CurrentUser.UserId;
+        string userId = GetUserIdSafe();
+        if (userId == null) return (false, "Usuario no autenticado.");
 
         try
         {
