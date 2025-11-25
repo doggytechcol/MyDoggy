@@ -5,6 +5,8 @@ using Firebase.Auth;
 using Firebase;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using Facebook.Unity;
 
 public class AuthService : MonoBehaviour
 {
@@ -31,6 +33,19 @@ public class AuthService : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+
+        // Inicializar Facebook SDK
+        if (!FB.IsInitialized)
+        {
+            FB.Init(() => {
+                Debug.Log("[AuthService] Facebook SDK inicializado.");
+                FB.ActivateApp();
+            });
+        }
+        else
+        {
+            FB.ActivateApp();
         }
     }
 
@@ -71,7 +86,6 @@ public class AuthService : MonoBehaviour
         if (!firebaseReady) return;
 
 #if UNITY_ANDROID
-        // 🔥 Fix fundamental para que Android espere a que Firebase termine la vinculación de sesión
         await Task.Delay(400);
 #endif
 
@@ -79,9 +93,6 @@ public class AuthService : MonoBehaviour
 
         FirebaseUser user = auth.CurrentUser;
 
-        // ------------------------------------------------------------
-        // ❌ NO AUTENTICADO
-        // ------------------------------------------------------------
         if (user == null)
         {
             Debug.Log("[Auth] Usuario no autenticado → Login");
@@ -92,9 +103,6 @@ public class AuthService : MonoBehaviour
             return;
         }
 
-        // ------------------------------------------------------------
-        // ✔️ AUTENTICADO
-        // ------------------------------------------------------------
         Debug.Log($"[Auth] Usuario autenticado: {user.UserId}");
 
         if (firestoreService == null)
@@ -103,7 +111,6 @@ public class AuthService : MonoBehaviour
             return;
         }
 
-        // Inicializar Firestore si no está listo
         if (!firestoreService.IsInitialized)
         {
             firestoreService.InitializeFirestore();
@@ -114,42 +121,20 @@ public class AuthService : MonoBehaviour
             }
         }
 
-        // 🔥 Fix permisos Firestore
         firestoreService.SetUser(user);
 
-        // ------------------------------------------------------------
-        // 🔄 Intentar cargar mascota
-        // ------------------------------------------------------------
         var petResult = await firestoreService.LoadPetAsync();
 
-        if (!petResult.success)
-        {
-            Debug.LogWarning("[Auth] No se pudo consultar Firestore. Enviando a CreatePet.");
-            StartCoroutine(RedirectToScene(Constants.SCENE_CREATE_PET));
-            return;
-        }
-
-        if (petResult.pet == null)
+        if (!petResult.success || petResult.pet == null)
         {
             Debug.Log("[Auth] Usuario sin mascota → CreatePet");
             StartCoroutine(RedirectToScene(Constants.SCENE_CREATE_PET));
             return;
         }
 
-        // ------------------------------------------------------------
-        // ✔️ Mascota existente → decidir escena
-        // ------------------------------------------------------------
-        string sceneToLoad = Constants.SCENE_MAP;
-
-        if (!string.IsNullOrEmpty(petResult.pet.lastScene))
-        {
-            sceneToLoad = petResult.pet.lastScene;
-            Debug.Log($"[Auth] Mascota encontrada. Última escena: {sceneToLoad}");
-        }
-        else
-        {
-            Debug.Log("[Auth] Mascota existe pero sin lastScene → Map");
-        }
+        string sceneToLoad = string.IsNullOrEmpty(petResult.pet.lastScene)
+            ? Constants.SCENE_MAP
+            : petResult.pet.lastScene;
 
         StartCoroutine(RedirectToScene(sceneToLoad));
     }
@@ -225,12 +210,38 @@ public class AuthService : MonoBehaviour
         }
     }
 
+    // ===============================================================
+    // 🔐 FACEBOOK LOGIN
+    // ===============================================================
+
+    public void LoginWithFacebook()
+    {
+        FB.LogInWithReadPermissions(new List<string> { "public_profile", "email" }, async result =>
+        {
+            if (FB.IsLoggedIn)
+            {
+                string token = AccessToken.CurrentAccessToken.TokenString;
+                var loginResult = await FacebookLoginAsync(token);
+
+                if (loginResult.success)
+                    Debug.Log("[AuthService] Login Facebook exitoso.");
+                else
+                    Debug.LogError("[AuthService] Error login Facebook: " + loginResult.errorMessage);
+            }
+            else
+            {
+                Debug.LogWarning("[AuthService] Login Facebook cancelado o fallido.");
+            }
+        });
+    }
+
     public async Task<(bool success, string errorMessage)> FacebookLoginAsync(string accessToken)
     {
         try
         {
             Credential credential = FacebookAuthProvider.GetCredential(accessToken);
             await auth.SignInWithCredentialAsync(credential);
+            Debug.Log("[AuthService] Usuario autenticado con Facebook correctamente.");
             return (true, null);
         }
         catch (Exception e)
@@ -268,3 +279,4 @@ public class AuthService : MonoBehaviour
             auth.StateChanged -= OnAuthStateChanged;
     }
 }
+

@@ -3359,6 +3359,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   facebookSignInButton: {fileID: 815804326}
+  statusLabel: {fileID: 1366533525}
 --- !u!1 &1466434983
 GameObject:
   m_ObjectHideFlags: 0
