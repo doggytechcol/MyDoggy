@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "671856043241-h1e59bk5t3rplie4levtitkgms3avtun.apps.googleusercontent.com",
+          "client_id": "671856043241-1kso9457ei85d37h8kona117ed4t51go.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.doggytech.mydoggy",
+            "certificate_hash": "994f2e994ff923614ac942bb4d24537a624e1f75"
+          }
+        },
+        {
+          "client_id": "671856043241-ql6d59rkugk6uoeobah4j3hm343781pq.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
