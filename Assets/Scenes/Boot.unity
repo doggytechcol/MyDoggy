@@ -566,6 +566,7 @@ GameObject:
   m_Component:
   - component: {fileID: 878663765}
   - component: {fileID: 878663766}
+  - component: {fileID: 878663767}
   m_Layer: 0
   m_Name: BootManager
   m_TagString: Untagged
@@ -608,6 +609,18 @@ MonoBehaviour:
   skipFadeDuration: 0.6
   authServicePrefab: {fileID: 2464394365765102276, guid: 1f50091ebc33ca242b574a83bf441b48, type: 3}
   firestoreServicePrefab: {fileID: 1167382936357265579, guid: 78a04fb386f665444baef3fbca13952e, type: 3}
+--- !u!114 &878663767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 878663763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2096e33b76f6f8b489ff07717846275a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &971928717
 GameObject:
   m_ObjectHideFlags: 0

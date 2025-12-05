@@ -1,41 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" 
-          xmlns:tools="http://schemas.android.com/tools" 
-          package="com.doggytech.mydoggy" 
-          android:versionCode="1" 
-          android:versionName="1.0">
-  
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" package="com.doggytech.mydoggy" android:versionCode="1" android:versionName="1.0">
   <queries>
+    <!-- Queries de Facebook -->
     <provider android:authorities="com.facebook.katana.provider.PlatformProvider" />
     <provider android:authorities="com.facebook.orca.provider.PlatformProvider" />
     <package android:name="com.facebook.katana" />
+    <!-- Requeridas para Google Sign-In, ya que usa APIs de Google Play Services -->
+    <package android:name="com.google.android.gms" />
   </queries>
-  
   <application android:label="@string/app_name" android:icon="@drawable/app_icon">
-    
-    <activity android:name="com.google.firebase.MessagingUnityPlayerActivity" 
-              android:theme="@style/BaseUnityGameActivityTheme" 
-              android:exported="true" 
-              android:launchMode="singleTask" 
-              android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen">
-      
+    <!-- 🔥 1. NUEVA ACTIVIDAD PRINCIPAL (PUENTE JAVA) -->
+    <!-- La actividad ahora es GoogleActivity, que extiende UnityPlayerActivity 
+             y maneja la respuesta del Intent nativo de Google Sign-In. -->
+    <activity android:name="com.doggytech.mydoggy.GoogleActivity" android:theme="@style/BaseUnityGameActivityTheme" android:exported="true" android:launchMode="singleTask" android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
-      
+      <!-- Filtro de Deep Linking de Facebook (existente) -->
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
         <data android:scheme="fb1874549566786832" />
       </intent-filter>
-      
       <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
     </activity>
-    
+    <!-- FIREBASE & FACEBOOK SERVICES Y ACTIVITIES (EXISTENTES) -->
     <service android:name="com.google.firebase.messaging.MessageForwardingService" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true" />
-    
     <activity android:name="com.facebook.FacebookActivity" android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" android:label="Mydoggy" />
     <activity android:name="com.facebook.unity.FBUnityLoginActivity" android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" android:exported="true" />
     <activity android:name="com.facebook.unity.FBUnityDialogsActivity" android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
@@ -45,17 +37,15 @@
     <activity android:name="com.facebook.unity.FBUnityGameRequestActivity" />
     <activity android:name="com.facebook.unity.FBUnityCreateGameGroupActivity" android:exported="false" />
     <activity android:name="com.facebook.unity.FBUnityJoinGameGroupActivity" android:exported="false" />
-    
-    <meta-data android:name="com.google.android.gms.games.APP_ID" android:value="671856043241-ql6d59rkugk6uoeobah4j3hm343781pq.apps.googleusercontent.com" /> 
-    
+    <!-- 🔥 2. ELIMINACIÓN DE LA META-DATA DE GPGS ROTA -->
+    <!-- Se ha eliminado: <meta-data android:name="com.google.android.gms.games.APP_ID" android:value="671856043241-ql6d59rkugk6uoeobah4j3hm343781pq.apps.googleusercontent.com" /> -->
+    <!-- La implementación nativa NO requiere esto. -->
+    <!-- FACEBOOK META-DATA (EXISTENTE) -->
     <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="fb1874549566786832" />
     <meta-data android:name="com.facebook.sdk.ClientToken" android:value="c33e9fe56c64fb752027c7b5df637950" />
     <meta-data android:name="com.facebook.sdk.AutoInitEnabled" android:value="true" />
     <meta-data android:name="com.facebook.sdk.AutoLogAppEventsEnabled" android:value="false" />
     <meta-data android:name="com.facebook.sdk.AdvertiserIDCollectionEnabled" android:value="true" />
-    
     <provider android:name="com.facebook.FacebookContentProvider" android:authorities="com.facebook.app.FacebookContentProvider1874549566786832" android:exported="true" />
-    
   </application>
-  
 </manifest>

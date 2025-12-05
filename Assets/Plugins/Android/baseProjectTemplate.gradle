@@ -1,0 +1,33 @@
+allprojects {
+    buildscript {
+        repositories {
+            google()
+            mavenCentral()
+        }
+        dependencies {
+            // Asegúrate de usar versiones de Gradle Plugin compatibles con tu entorno (AGP 7.2.2 requiere Gradle 7.5+)
+            classpath 'com.android.tools.build:gradle:7.2.2' 
+            classpath 'com.google.gms:google-services:4.4.1'
+        }
+    }
+
+    repositories {
+        google()
+        mavenCenter()
+        flatDir {
+            dirs "${project(':unityLibrary').projectDir}/libs"
+        }
+    }
+}
+
+// 🔥 CORRECCIÓN: Usamos los nombres completos de variables (compileSdkVersion, etc.) para que el launcher las encuentre.
+ext {
+    compileSdkVersion = **SDK_VERSION**
+    minSdkVersion = **MIN_SDK_VERSION**
+    targetSdkVersion = **TARGET_SDK_VERSION**
+    buildToolsVersion = "**BUILDTOOLS_VERSION**"
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

@@ -1,0 +1,60 @@
+apply plugin: 'com.android.application'
+apply from: 'setupSymbols.gradle'
+apply from: '../shared/keepUnitySymbols.gradle'
+apply plugin: 'com.google.gms.google-services' 
+
+dependencies {
+    implementation project(':unityLibrary')
+    **DEPS**
+}
+
+android {
+    ndkPath "**NDKPATH**"
+    ndkVersion "**NDKVERSION**"
+    namespace 'com.doggytech.mydoggy'
+    
+    // CORRECCIÓN: Usamos 'compileSdk'
+    compileSdk rootProject.ext.compileSdk
+
+    defaultConfig {
+        // CORRECCIÓN: Usamos 'minSdk' y 'targetSdk'
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
+        applicationId 'com.doggytech.mydoggy'
+        versionCode **VERSIONCODE**
+        versionName '**VERSIONNAME**'
+    }
+
+    lint {
+        abortOnError false
+    }
+
+    androidResources {
+        noCompress = ['.unity3d', '.ress', '.resource', '.obb', **BUILTIN_NOCOMPRESS**] + unityStreamingAssets.tokenize(', ')
+    }
+    
+    signingConfigs {
+        debug {
+            storeFile file('**DEBUG_KEYSTORE**')
+            storePassword '**DEBUG_KEYSTORE_PASS**'
+            keyAlias '**DEBUG_KEYALIAS**'
+            keyPassword '**DEBUG_KEYALIAS_PASS**'
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+            minifyEnabled **MINIFY_DEBUG**
+            proguardFiles getDefaultProguardFile('proguard-android.txt')**CUSTOM_PROGUARD_FILE**
+            jniDebuggable true
+        }
+        release {
+            signingConfig signingConfigs.debug
+            minifyEnabled **MINIFY_RELEASE**
+            proguardFiles getDefaultProguardFile('proguard-android.txt')**CUSTOM_PROGUARD_FILE**
+        }
+    }
+}
+
+**EXTERNAL_SOURCES**

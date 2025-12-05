@@ -9,6 +9,15 @@ using UnityEngine.UI;
 public class LoginUI : MonoBehaviour
 {
     // ============================================================
+    //  INSTANCIAS DE SERVICIOS
+    // ============================================================
+
+    [Header("Servicios de Autenticación")]
+    private AuthService authService;
+    private GoogleLoginController googleController;
+
+
+    // ============================================================
     //  LOGIN & REGISTER
     // ============================================================
 
@@ -19,8 +28,6 @@ public class LoginUI : MonoBehaviour
     [Header("Feedback & Status")]
     public TMP_Text statusLabel;
     public GameObject loadingPanel;
-
-    private AuthService authService;
 
 
     // ============================================================
@@ -35,21 +42,38 @@ public class LoginUI : MonoBehaviour
 
 
     // ============================================================
-    //  START
+    //  START & SETUP
     // ============================================================
 
     private void Start()
     {
+        // Limpieza de estado inicial
         SetFeedback("", false);
         if (loadingPanel) loadingPanel.SetActive(false);
         if (forgotPasswordPopup) forgotPasswordPopup.SetActive(false);
         if (popupLoadingPanel) popupLoadingPanel.SetActive(false);
 
+        // Obtener referencias a los Singletons
         authService = AuthService.Instance;
+
+        // Corregido: Usamos FindAnyObjectByType para encontrar el controlador local (en esta escena)
+        // Esto es necesario para iniciar el flujo nativo de Google.
+        googleController = FindAnyObjectByType<GoogleLoginController>();
 
         if (authService == null)
         {
             SetFeedback("*Error: Servicio de Autenticación no cargado.", true);
+        }
+        else
+        {
+            // ⭐ AUTO-REGISTRO: Enviar la referencia a la instancia persistente (AuthService).
+            // Esto permite que el servicio persistente envíe feedback de errores nativos a esta UI transitoria.
+            authService.RegisterLoginUI(this);
+
+            if (googleController == null)
+            {
+                Debug.LogWarning("[LoginUI] GoogleLoginController no encontrado. El login nativo de Google no funcionará.");
+            }
         }
     }
 
@@ -58,15 +82,22 @@ public class LoginUI : MonoBehaviour
     //  FEEDBACK GENERAL
     // ============================================================
 
-    private void SetFeedback(string message, bool isError)
+    /// <summary>
+    /// Establece el mensaje de feedback en la UI de Login.
+    /// </summary>
+    /// <param name="message">Mensaje a mostrar.</param>
+    /// <param name="isError">Si es verdadero, el texto podría ser rojo/negrita.</param>
+    public void SetFeedback(string message, bool isError)
     {
         if (statusLabel == null) return;
         statusLabel.text = message;
+        // Aquí podrías cambiar el color de statusLabel si deseas 
+        // (e.g., statusLabel.color = isError ? Color.red : Color.white)
     }
 
 
     // ============================================================
-    //  LOGIN
+    //  LOGIN/REGISTER (Email/Password)
     // ============================================================
 
     public void OnLoginPressed()
@@ -78,11 +109,6 @@ public class LoginUI : MonoBehaviour
         );
     }
 
-
-    // ============================================================
-    //  REGISTER
-    // ============================================================
-
     public void OnRegisterPressed()
     {
         if (!ValidateInputs(true)) return;
@@ -91,6 +117,41 @@ public class LoginUI : MonoBehaviour
             authService.RegisterAsync(emailInput.text, passwordInput.text),
             true
         );
+    }
+
+
+    // ============================================================
+    // ⭐ LOGIN SOCIAL: GOOGLE NATIVO
+    // ============================================================
+
+    /// <summary>
+    /// Llamado por el botón de Google. Inicia el proceso nativo.
+    /// </summary>
+    public void OnGoogleLoginPressed()
+    {
+        if (googleController == null)
+        {
+            SetFeedback("Controlador de Google no encontrado. Verifica la configuración.", true);
+            return;
+        }
+
+        // Activamos el panel de carga mientras se abre el Intent de Google
+        if (loadingPanel) loadingPanel.SetActive(true);
+        SetFeedback("Abriendo ventana de Google...", false);
+
+        // La respuesta (éxito o fallo) se gestiona en AuthService después del callback nativo.
+        googleController.StartGoogleSignIn();
+    }
+
+    // ⭐ LOGIN SOCIAL: FACEBOOK
+    public void OnFacebookLoginPressed()
+    {
+        SetFeedback("Iniciando sesión con Facebook...", false);
+        if (loadingPanel) loadingPanel.SetActive(true);
+
+        // La lógica de Facebook, incluyendo el manejo de callbacks y feedback,
+        // está centralizada en AuthService.
+        authService.FacebookLoginUI();
     }
 
 
